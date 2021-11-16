@@ -3,7 +3,6 @@
  *
  * This example shows how to configure TLS
  */
-
 #include "iec61850_client.h"
 
 #include <stdlib.h>
@@ -11,6 +10,12 @@
 
 #include "hal_thread.h"
 
+
+using namespace std;
+
+static TLSConfiguration tlsConfig;
+
+static IedConnection con;
 
 void
 reportCallbackFunction(void* parameter, ClientReport report)
@@ -30,43 +35,49 @@ reportCallbackFunction(void* parameter, ClientReport report)
     }
 }
 
-int main(int argc, char** argv) {
-
-    char* hostname;
-
-    if (argc > 1)
-        hostname = argv[1];
-    else
-        hostname = (char*) "localhost";
-
-    TLSConfiguration tlsConfig = TLSConfiguration_create();
+static void initTLSConfig() {
+    tlsConfig = TLSConfiguration_create();
 
     TLSConfiguration_setChainValidation(tlsConfig, true);
     TLSConfiguration_setAllowOnlyKnownCertificates(tlsConfig, false);
 
     if (!TLSConfiguration_setOwnKeyFromFile(tlsConfig, "client1-key.pem", NULL)) {
         printf("ERROR: Failed to load private key!\n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
     if (!TLSConfiguration_setOwnCertificateFromFile(tlsConfig, "client1.cer")) {
         printf("ERROR: Failed to load own certificate!\n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
     if (!TLSConfiguration_addCACertificateFromFile(tlsConfig, "root.cer")) {
         printf("ERROR: Failed to load root certificate\n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
+}
 
-    IedClientError error;
+static IedConnection initConnection(char* hostname = (char*) "localhost") {
+      IedClientError error;
+      con = IedConnection_createWithTlsSupport(tlsConfig);
+      IedConnection_connect(con, &error, hostname, -1);
+      if (error != IED_ERROR_OK) {
+          printf("Failed to connect to %s  %i\n", hostname, error);
+          exit(EXIT_FAILURE);
+      }
+      return con;
+}
 
-    IedConnection con = IedConnection_createWithTlsSupport(tlsConfig);
 
-    IedConnection_connect(con, &error, hostname, -1);
+int main(int argc, char** argv) {
+    initTLSConfig();
+    if (argc > 1)
+        con = initConnection(argv[1]);
+    else
+        con = initConnection();
 
-    if (error == IED_ERROR_OK) {
-
+    if (con != NULL) {
+        IedClientError error;
         LinkedList serverDirectory = IedConnection_getServerDirectory(con, &error, false);
 
         if (error != IED_ERROR_OK)
@@ -147,9 +158,6 @@ int main(int argc, char** argv) {
         close_connection:
 
         IedConnection_close(con);
-    }
-    else {
-        printf("Failed to connect to %s\n", hostname);
     }
 
     IedConnection_destroy(con);
