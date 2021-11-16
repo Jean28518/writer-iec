@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
     if (argc > 1)
         hostname = argv[1];
     else
-        hostname = "localhost";
+        hostname = (char*) "localhost";
 
     TLSConfiguration tlsConfig = TLSConfiguration_create();
 
@@ -157,5 +157,3 @@ int main(int argc, char** argv) {
     TLSConfiguration_destroy(tlsConfig);
     return 0;
 }
-
-

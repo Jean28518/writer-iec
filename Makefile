@@ -1,7 +1,7 @@
 LIBIEC_HOME=../
 
 PROJECT_BINARY_NAME = writer_iec
-PROJECT_SOURCES = writer_iec.c
+PROJECT_SOURCES = writer_iec.cpp
 
 include $(LIBIEC_HOME)/make/target_system.mk
 include $(LIBIEC_HOME)/make/stack_includes.mk
