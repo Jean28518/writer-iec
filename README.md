@@ -2,7 +2,7 @@
 Simple script for writing values to iec servers.
 
 # Build Instructions on unix systems:
-- Download lastest version of libiec61850.tar.gz and extract it.
+- Download lastest version of libiec61850.tar.gz and extract it: https://libiec61850.com/downloads/
 - Download the required version of mbedtls (can be found in README.md of libiec archive): https://github.com/ARMmbed/mbedtls/releases
 - Install required packages with e.g. `apt install build-essential gcc `
 - Extract libiec.tar.gz and mbedtls.zip
@@ -10,4 +10,4 @@ Simple script for writing values to iec servers.
 - Move the mbedtls folder to third_party/mbedtls/ in the libiec61850 folder.
 - Run `make WITH_MBEDTLS=1` in the libiec61850 folder
 - Move this repository to the root of the libiec61850 folder
-- Run `make` in `libiec61850/writer-example` folder
+- Run `make` in `libiec61850/writer-iec` folder
